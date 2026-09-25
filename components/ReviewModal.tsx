@@ -250,8 +250,9 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                           type="text"
                           required
                           value={name}
+                          placeholder="Your Name"
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="John Doe"
+                          
                           className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:border-purple-500 focus:outline-none transition-colors text-sm"
                         />
                       </div>
@@ -269,7 +270,7 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="john@example.com"
+                          placeholder="your-email@gmail.com"
                           className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:border-purple-500 focus:outline-none transition-colors text-sm"
                         />
                       </div>

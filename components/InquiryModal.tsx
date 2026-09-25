@@ -198,7 +198,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                           name="name"
                           type="text"
                           required
-                          placeholder="John Doe"
+                          placeholder="Your Name"
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
                         />
                       </div>
@@ -215,7 +215,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                           name="email"
                           type="email"
                           required
-                          placeholder="john@example.com"
+                          placeholder="your-email@gmail.com"
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
                         />
                       </div>
@@ -234,7 +234,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                           id="phone"
                           name="phone"
                           type="tel"
-                          placeholder="+91 98765 43210"
+                          placeholder="+91 XXXXX XXXXX"
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
                         />
                       </div>
