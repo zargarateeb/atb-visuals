@@ -4,6 +4,7 @@ export interface IProject extends Document {
   title: string;
   category: "saas" | "podcast" | "motion" | "fast";
   vimeoUrl: string;
+  thumbnailUrl?: string;
   order: number;
   createdAt: Date;
 }
@@ -17,6 +18,7 @@ const ProjectSchema = new Schema<IProject>(
       enum: ["saas", "podcast", "motion", "fast"],
     },
     vimeoUrl: { type: String, required: true },
+    thumbnailUrl: { type: String },
     order: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
   },

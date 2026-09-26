@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Player from "@vimeo/player";
 
 interface VideoCardProps {
   vimeoUrl: string;
   shape: "vertical" | "horizontal";
+  thumbnailUrl?: string;
 }
 
 const getVimeoId = (url: string) => {
@@ -13,7 +15,11 @@ const getVimeoId = (url: string) => {
   return match ? match[1] : "";
 };
 
-export default function VideoCard({ vimeoUrl, shape }: VideoCardProps) {
+export default function VideoCard({
+  vimeoUrl,
+  shape,
+  thumbnailUrl,
+}: VideoCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<Player | null>(null);
   const [isMuted, setIsMuted] = useState(true);
@@ -124,6 +130,17 @@ export default function VideoCard({ vimeoUrl, shape }: VideoCardProps) {
           "0 20px 50px rgba(0,0,0,0.3), 0 0 40px rgba(230, 162, 60, 0.2)",
       }}
     >
+      {/* Custom thumbnail poster — fades out on hover */}
+      {thumbnailUrl && (
+        <motion.img
+          src={thumbnailUrl}
+          alt=""
+          initial={false}
+          animate={{ opacity: hovered ? 0 : 1 }}
+          transition={{ duration: 0.3 }}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+        />
+      )}
       <div
         ref={containerRef}
         className="absolute inset-0 w-full h-full"

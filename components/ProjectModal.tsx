@@ -8,6 +8,7 @@ interface Project {
   title: string;
   category: "saas" | "podcast" | "motion" | "fast";
   vimeoUrl: string;
+  thumbnailUrl?: string;
   order: number;
 }
 
@@ -36,6 +37,7 @@ export default function ProjectModal({
     "saas" | "podcast" | "motion" | "fast"
   >("saas");
   const [vimeoUrl, setVimeoUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [order, setOrder] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -49,11 +51,13 @@ export default function ProjectModal({
         setTitle(editingProject.title);
         setCategory(editingProject.category);
         setVimeoUrl(editingProject.vimeoUrl);
+        setThumbnailUrl(editingProject.thumbnailUrl || "");
         setOrder(editingProject.order);
       } else {
         setTitle("");
         setCategory("saas");
         setVimeoUrl("");
+        setThumbnailUrl("");
         setOrder(0);
       }
       setError("");
@@ -74,7 +78,13 @@ export default function ProjectModal({
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, category, vimeoUrl, order }),
+        body: JSON.stringify({
+          title,
+          category,
+          vimeoUrl,
+          thumbnailUrl,
+          order,
+        }),
       });
 
       const data = await res.json();
@@ -204,6 +214,27 @@ export default function ProjectModal({
                   />
                   <p className="text-[10px] text-neutral-500 mt-1">
                     Paste the normal Vimeo share link (not the embed).
+                  </p>
+                </div>
+                
+                {/* Thumbnail URL */}
+                <div>
+                  <label
+                    htmlFor="thumbnailUrl"
+                    className="block text-xs text-neutral-400 mb-1.5 font-medium"
+                    >
+                    Thumbnail Image URL (optional)
+                  </label>
+                  <input
+                    id="thumbnailUrl"
+                    type="url"
+                    value={thumbnailUrl}
+                    onChange={(e) => setThumbnailUrl(e.target.value)}
+                    placeholder="https://ik.imagekit.io/..."
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
+                  />
+                  <p className="text-[10px] text-neutral-500 mt-1">
+                    Upload to ImageKit and paste the URL. Shows as poster before video plays.
                   </p>
                 </div>
 

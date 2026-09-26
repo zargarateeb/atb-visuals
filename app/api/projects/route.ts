@@ -23,21 +23,22 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
 
-    const { title, category, vimeoUrl, order } = body;
+    const { title, category, vimeoUrl, thumbnailUrl, order } = body;
 
     if (!title || !category || !vimeoUrl) {
-      return NextResponse.json(
-        { success: false, error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+  return NextResponse.json(
+    { success: false, error: "Missing required fields" },
+    { status: 400 }
+  );
+}
 
-    const project = await Project.create({
-      title,
-      category,
-      vimeoUrl,
-      order: order ?? 0,
-    });
+const project = await Project.create({
+  title,
+  category,
+  vimeoUrl,
+  thumbnailUrl: thumbnailUrl || undefined,
+  order: order ?? 0,
+});
 
     return NextResponse.json({ success: true, project }, { status: 201 });
   } catch (error) {

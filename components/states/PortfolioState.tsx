@@ -15,6 +15,7 @@ interface Project {
   title: string;
   category: "saas" | "podcast" | "motion" | "fast";
   vimeoUrl: string;
+  thumbnailUrl?: string;
   order: number;
 }
 
@@ -23,7 +24,7 @@ interface Category {
   title: string[];
   subtitle: string;
   shape: "vertical" | "horizontal";
-  videos: { url: string; title: string }[];
+  videos: { url: string; title: string; thumbnailUrl?: string }[];
 }
 
 const CATEGORY_META: Omit<Category, "videos">[] = [
@@ -90,8 +91,12 @@ export default function PortfolioState({
     videos: projects
       .filter((p) => p.category === meta.id)
       .sort((a, b) => a.order - b.order)
-      .map((p) => ({ url: p.vimeoUrl, title: p.title })),
-  }));
+      .map((p) => ({
+        url: p.vimeoUrl,
+        title: p.title,
+        thumbnailUrl: p.thumbnailUrl,
+      })),
+    }));
 
   const current = CATEGORIES[mod(grid.x + grid.y, CATEGORIES.length)];
   const isVertical = current.shape === "vertical";
@@ -165,7 +170,12 @@ export default function PortfolioState({
           ) : isVertical ? (
             <div className="flex items-center justify-center gap-6">
               {current.videos.map((v) => (
-                <VideoCard key={v.url} vimeoUrl={v.url} shape="vertical" />
+                <VideoCard
+                  key={v.url}
+                  vimeoUrl={v.url}
+                  thumbnailUrl={v.thumbnailUrl}
+                  shape="vertical"
+                />
               ))}
             </div>
           ) : (
@@ -179,7 +189,11 @@ export default function PortfolioState({
                     maxWidth: "min(50vw, 640px)",
                   }}
                 >
-                  <VideoCard vimeoUrl={v.url} shape="horizontal" />
+                  <VideoCard
+                    vimeoUrl={v.url}
+                    thumbnailUrl={v.thumbnailUrl}
+                    shape="horizontal"
+                  />
                 </div>
               ))}
             </div>
