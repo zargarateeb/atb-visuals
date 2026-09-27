@@ -3,80 +3,71 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface Project {
+interface Category {
   _id?: string;
-  title: string;
-  category: string;
-  vimeoUrl: string;
-  thumbnailUrl?: string;
+  name: string;
+  slug: string;
+  description?: string;
+  shape: "vertical" | "horizontal";
   order: number;
 }
 
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-}
-
-interface ProjectModalProps {
+interface CategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaved: () => void;
-  editingProject?: Project | null;
+  editingCategory?: Category | null;
 }
 
-export default function ProjectModal({
+export default function CategoryModal({
   isOpen,
   onClose,
   onSaved,
-  editingProject,
-}: ProjectModalProps) {
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<string>("");
-  const [vimeoUrl, setVimeoUrl] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  editingCategory,
+}: CategoryModalProps) {
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
+  const [shape, setShape] = useState<"vertical" | "horizontal">("vertical");
   const [order, setOrder] = useState(0);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const isEdit = !!editingProject?._id;
+  const isEdit = !!editingCategory?._id;
 
-  // Fetch categories on mount
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-        if (data.success) {
-          setCategories(data.categories);
-        }
-      } catch (err) {
-        console.error("Failed to fetch categories:", err);
-      }
-    };
-    fetchCategories();
-  }, []);
+  // Auto-generate slug from name
+  const handleNameChange = (value: string) => {
+    setName(value);
+    // Only auto-fill slug if adding new category (not editing)
+    if (!isEdit) {
+      const autoSlug = value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+      setSlug(autoSlug);
+    }
+  };
 
-  // Reset / prefill on open
   useEffect(() => {
     if (isOpen) {
-      if (editingProject) {
-        setTitle(editingProject.title);
-        setCategory(editingProject.category);
-        setVimeoUrl(editingProject.vimeoUrl);
-        setThumbnailUrl(editingProject.thumbnailUrl || "");
-        setOrder(editingProject.order);
+      if (editingCategory) {
+        setName(editingCategory.name);
+        setSlug(editingCategory.slug);
+        setDescription(editingCategory.description || "");
+        setShape(editingCategory.shape);
+        setOrder(editingCategory.order);
       } else {
-        setTitle("");
-        setCategory(categories[0]?.slug || "");
-        setVimeoUrl("");
-        setThumbnailUrl("");
+        setName("");
+        setSlug("");
+        setDescription("");
+        setShape("vertical");
         setOrder(0);
       }
       setError("");
     }
-  }, [isOpen, editingProject, categories]);
+  }, [isOpen, editingCategory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,20 +76,14 @@ export default function ProjectModal({
 
     try {
       const url = isEdit
-        ? `/api/projects/${editingProject!._id}`
-        : "/api/projects";
+        ? `/api/categories/${editingCategory!._id}`
+        : "/api/categories";
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          category,
-          vimeoUrl,
-          thumbnailUrl,
-          order,
-        }),
+        body: JSON.stringify({ name, slug, description, shape, order }),
       });
 
       const data = await res.json();
@@ -138,8 +123,7 @@ export default function ProjectModal({
             <div
               className="relative w-full max-w-lg rounded-3xl p-6 md:p-8 pointer-events-auto max-h-[92vh] overflow-y-auto"
               style={{
-                background:
-                  "linear-gradient(180deg, #1a0033 0%, #10001F 100%)",
+                background: "linear-gradient(180deg, #1a0033 0%, #10001F 100%)",
                 border: "1px solid rgba(192, 0, 255, 0.3)",
                 boxShadow:
                   "0 0 60px rgba(160, 0, 255, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
@@ -154,122 +138,112 @@ export default function ProjectModal({
               </button>
 
               <h2 className="font-display text-2xl font-bold text-white mb-6">
-                {isEdit ? "Edit Project" : "Add New Project"}
+                {isEdit ? "Edit Category" : "Add New Category"}
               </h2>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                {/* Title */}
+                {/* Name */}
                 <div>
                   <label
-                    htmlFor="title"
+                    htmlFor="cat-name"
                     className="block text-xs text-neutral-400 mb-1.5 font-medium"
                   >
-                    Project Title *
+                    Display Name *
                   </label>
                   <input
-                    id="title"
+                    id="cat-name"
                     type="text"
                     required
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. SaaS Animation 3"
+                    value={name}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    placeholder="Case Studies"
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
                   />
                 </div>
 
-                {/* Category */}
+                {/* Slug */}
                 <div>
                   <label
-                    htmlFor="category"
+                    htmlFor="cat-slug"
                     className="block text-xs text-neutral-400 mb-1.5 font-medium"
                   >
-                    Category *
+                    Slug * (URL-safe, no spaces)
+                  </label>
+                  <input
+                    id="cat-slug"
+                    type="text"
+                    required
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
+                    placeholder="case-studies"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm font-mono"
+                  />
+                  <p className="text-[10px] text-neutral-500 mt-1">
+                    Used internally. Must be unique. Lowercase + hyphens.
+                  </p>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label
+                    htmlFor="cat-description"
+                    className="block text-xs text-neutral-400 mb-1.5 font-medium"
+                  >
+                    Description / Subtitle
+                  </label>
+                  <input
+                    id="cat-description"
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Long-form breakdowns of my best work"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
+                  />
+                </div>
+
+                {/* Shape */}
+                <div>
+                  <label
+                    htmlFor="cat-shape"
+                    className="block text-xs text-neutral-400 mb-1.5 font-medium"
+                  >
+                    Video Card Shape *
                   </label>
                   <select
-                    id="category"
+                    id="cat-shape"
                     required
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    value={shape}
+                    onChange={(e) =>
+                      setShape(e.target.value as "vertical" | "horizontal")
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500 focus:outline-none transition-colors text-sm cursor-pointer"
                   >
-                    {categories.length === 0 ? (
-                      <option value="" disabled className="bg-neutral-900">
-                        Loading categories...
-                      </option>
-                    ) : (
-                      categories.map((c) => (
-                        <option
-                          key={c.slug}
-                          value={c.slug}
-                          className="bg-neutral-900"
-                        >
-                          {c.name}
-                        </option>
-                      ))
-                    )}
+                    <option value="vertical" className="bg-neutral-900">
+                      Vertical (9:16 — Reels, Shorts, TikTok)
+                    </option>
+                    <option value="horizontal" className="bg-neutral-900">
+                      Horizontal (16:9 — YouTube, SaaS ads)
+                    </option>
                   </select>
-                </div>
-
-                {/* Vimeo URL */}
-                <div>
-                  <label
-                    htmlFor="vimeoUrl"
-                    className="block text-xs text-neutral-400 mb-1.5 font-medium"
-                  >
-                    Vimeo URL *
-                  </label>
-                  <input
-                    id="vimeoUrl"
-                    type="url"
-                    required
-                    value={vimeoUrl}
-                    onChange={(e) => setVimeoUrl(e.target.value)}
-                    placeholder="https://vimeo.com/123456789"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
-                  />
-                  <p className="text-[10px] text-neutral-500 mt-1">
-                    Paste the normal Vimeo share link (not the embed).
-                  </p>
-                </div>
-
-                {/* Thumbnail URL */}
-                <div>
-                  <label
-                    htmlFor="thumbnailUrl"
-                    className="block text-xs text-neutral-400 mb-1.5 font-medium"
-                  >
-                    Thumbnail Image URL (optional)
-                  </label>
-                  <input
-                    id="thumbnailUrl"
-                    type="url"
-                    value={thumbnailUrl}
-                    onChange={(e) => setThumbnailUrl(e.target.value)}
-                    placeholder="https://ik.imagekit.io/..."
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
-                  />
-                  <p className="text-[10px] text-neutral-500 mt-1">
-                    Upload to ImageKit and paste the URL.
-                  </p>
                 </div>
 
                 {/* Order */}
                 <div>
                   <label
-                    htmlFor="order"
+                    htmlFor="cat-order"
                     className="block text-xs text-neutral-400 mb-1.5 font-medium"
                   >
                     Display Order
                   </label>
                   <input
-                    id="order"
+                    id="cat-order"
                     type="number"
                     value={order}
                     onChange={(e) => setOrder(Number(e.target.value))}
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm"
                   />
                   <p className="text-[10px] text-neutral-500 mt-1">
-                    Lower number = shown first.
+                    Lower number shows first. Auto-sorted in admin.
                   </p>
                 </div>
 
@@ -286,17 +260,12 @@ export default function ProjectModal({
                   whileTap={{ scale: saving ? 1 : 0.98 }}
                   className="mt-2 px-6 py-3 rounded-full text-white font-semibold text-sm cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                   style={{
-                    background:
-                      "linear-gradient(180deg, #C000FF, #8A00E0)",
+                    background: "linear-gradient(180deg, #C000FF, #8A00E0)",
                     boxShadow:
                       "0 0 25px rgba(192, 0, 255, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)",
                   }}
                 >
-                  {saving
-                    ? "Saving..."
-                    : isEdit
-                    ? "Save Changes"
-                    : "Add Project"}
+                  {saving ? "Saving..." : isEdit ? "Save Changes" : "Add Category"}
                 </motion.button>
               </form>
             </div>

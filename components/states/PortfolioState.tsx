@@ -13,46 +13,28 @@ interface PortfolioStateProps {
 interface Project {
   _id: string;
   title: string;
-  category: "saas" | "podcast" | "motion" | "fast";
+  category: string;
   vimeoUrl: string;
   thumbnailUrl?: string;
   order: number;
 }
 
+interface CategoryDB {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  shape: "vertical" | "horizontal";
+  order: number;
+}
+
 interface Category {
-  id: "saas" | "podcast" | "motion" | "fast";
-  title: string[];
-  subtitle: string;
+  id: string;
+  name: string;
+  description: string;
   shape: "vertical" | "horizontal";
   videos: { url: string; title: string; thumbnailUrl?: string }[];
 }
-
-const CATEGORY_META: Omit<Category, "videos">[] = [
-  {
-    id: "saas",
-    title: ["SaaS", "Animations"],
-    subtitle: "Premium Advertisements using Motion Graphics",
-    shape: "horizontal",
-  },
-  {
-    id: "podcast",
-    title: ["Head-Tracking /", "Podcast Edits"],
-    subtitle: "Facecam Edits to gain more views",
-    shape: "vertical",
-  },
-  {
-    id: "motion",
-    title: ["Motion Graphics", "Reels Edits"],
-    subtitle: "Powerful reels with premium visuals",
-    shape: "vertical",
-  },
-  {
-    id: "fast",
-    title: ["Fast-Paced Reels", "Edits"],
-    subtitle: "Motivational/Influencial Reels Editing",
-    shape: "vertical",
-  },
-];
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
@@ -65,42 +47,80 @@ export default function PortfolioState({
     "left" | "right" | "up" | "down"
   >("right");
   const [projects, setProjects] = useState<Project[]>([]);
+  const [categoriesDB, setCategoriesDB] = useState<CategoryDB[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch projects from DB
+  // Fetch categories + projects on mount
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await fetch("/api/projects");
-        const data = await res.json();
-        if (data.success) {
-          setProjects(data.projects);
-        }
+        const [projRes, catRes] = await Promise.all([
+          fetch("/api/projects"),
+          fetch("/api/categories"),
+        ]);
+        const projData = await projRes.json();
+        const catData = await catRes.json();
+        if (projData.success) setProjects(projData.projects);
+        if (catData.success) setCategoriesDB(catData.categories);
       } catch (err) {
-        console.error("Failed to fetch projects:", err);
+        console.error("Failed to fetch data:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProjects();
+    fetchAll();
   }, []);
 
-  // Build categories with their videos from DB
-  const CATEGORIES: Category[] = CATEGORY_META.map((meta) => ({
-    ...meta,
-    videos: projects
-      .filter((p) => p.category === meta.id)
-      .sort((a, b) => a.order - b.order)
-      .map((p) => ({
-        url: p.vimeoUrl,
-        title: p.title,
-        thumbnailUrl: p.thumbnailUrl,
-      })),
+  // Build categories with their projects from DB
+  const categories: Category[] = [...categoriesDB]
+    .sort((a, b) => a.order - b.order)
+    .map((cat) => ({
+      id: cat.slug,
+      name: cat.name,
+      description: cat.description || "",
+      shape: cat.shape,
+      videos: projects
+        .filter((p) => p.category === cat.slug)
+        .sort((a, b) => a.order - b.order)
+        .map((p) => ({
+          url: p.vimeoUrl,
+          title: p.title,
+          thumbnailUrl: p.thumbnailUrl,
+        })),
     }));
 
-  const current = CATEGORIES[mod(grid.x + grid.y, CATEGORIES.length)];
+  const totalCategories = categories.length;
+
+  // Handle no categories gracefully
+  if (totalCategories === 0 && !loading) {
+    return (
+      <div
+        className="relative w-full h-full flex items-center justify-center"
+        style={{ background: "#DDE5FC" }}
+      >
+        <p className="text-neutral-500 text-sm font-medium">
+          No categories yet. Add some in the admin panel.
+        </p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div
+        className="relative w-full h-full flex items-center justify-center"
+        style={{ background: "#DDE5FC" }}
+      >
+        <p className="text-neutral-500 text-sm font-medium">
+          Loading portfolio...
+        </p>
+      </div>
+    );
+  }
+
+  const current = categories[mod(grid.x + grid.y, totalCategories)];
   const isVertical = current.shape === "vertical";
-  const categoryIndex = mod(grid.x + grid.y, CATEGORIES.length);
+  const categoryIndex = mod(grid.x + grid.y, totalCategories);
 
   const go = (dir: "left" | "right" | "up" | "down") => {
     setEntering(dir);
@@ -118,19 +138,6 @@ export default function PortfolioState({
       : entering === "down"
       ? { x: 0, y: 80 }
       : { x: 0, y: -80 };
-
-  if (loading) {
-    return (
-      <div
-        className="relative w-full h-full flex items-center justify-center"
-        style={{ background: "#DDE5FC" }}
-      >
-        <p className="text-neutral-500 text-sm font-medium">
-          Loading portfolio...
-        </p>
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -156,11 +163,13 @@ export default function PortfolioState({
         >
           <div className="text-center mb-8 md:mb-10">
             <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 leading-[1.05]">
-              {current.title[0]} {current.title[1]}
+              {current.name}
             </h2>
-            <p className="text-neutral-600 text-sm md:text-base font-medium mt-3">
-              {current.subtitle}
-            </p>
+            {current.description && (
+              <p className="text-neutral-600 text-sm md:text-base font-medium mt-3">
+                {current.description}
+              </p>
+            )}
           </div>
 
           {current.videos.length === 0 ? (
@@ -168,7 +177,7 @@ export default function PortfolioState({
               No projects in this category yet.
             </p>
           ) : isVertical ? (
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-6 flex-wrap">
               {current.videos.map((v) => (
                 <VideoCard
                   key={v.url}
@@ -203,8 +212,9 @@ export default function PortfolioState({
 
       <ClickableHints onNavigate={go} />
 
+      {/* Category loop indicator */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40">
-        {CATEGORIES.map((c, i) => (
+        {categories.map((c, i) => (
           <div
             key={c.id}
             className={`h-1.5 rounded-full transition-all ${
@@ -215,24 +225,8 @@ export default function PortfolioState({
           />
         ))}
       </div>
-      {/* Reviews button */}
-<motion.button
-  onClick={(e) => onTestimonials(e)}
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6, delay: 0.75 }}
-  whileHover={{ scale: 1.06 }}
-  whileTap={{ scale: 0.96 }}
-  className="fixed bottom-6 right-52 z-40 px-5 py-3 rounded-full text-white font-semibold text-xs md:text-sm cursor-pointer"
-  style={{
-    background: "rgba(0,0,0,0.6)",
-    backdropFilter: "blur(10px)",
-    border: "1px solid rgba(230, 162, 60, 0.5)",
-    boxShadow: "0 0 20px rgba(230, 162, 60, 0.3)",
-  }}
->
-  ⭐ Reviews
-</motion.button>
+
+      {/* Persistent ORDER NOW button */}
       <motion.button
         onClick={(e) => onOrder(e)}
         initial={{ opacity: 0, y: 20 }}
@@ -254,6 +248,25 @@ export default function PortfolioState({
         >
           ORDER NOW →
         </motion.span>
+      </motion.button>
+
+      {/* Reviews button */}
+      <motion.button
+        onClick={(e) => onTestimonials(e)}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.75 }}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.96 }}
+        className="fixed bottom-6 right-52 z-40 px-5 py-3 rounded-full text-white font-semibold text-xs md:text-sm cursor-pointer"
+        style={{
+          background: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(10px)",
+          border: "1px solid rgba(230, 162, 60, 0.5)",
+          boxShadow: "0 0 20px rgba(230, 162, 60, 0.3)",
+        }}
+      >
+        ⭐ Reviews
       </motion.button>
     </motion.div>
   );

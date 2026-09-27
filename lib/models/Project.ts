@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IProject extends Document {
   title: string;
-  category: "saas" | "podcast" | "motion" | "fast";
+  category: string; // Now any string — matches a Category slug
   vimeoUrl: string;
   thumbnailUrl?: string;
   order: number;
@@ -12,11 +12,7 @@ export interface IProject extends Document {
 const ProjectSchema = new Schema<IProject>(
   {
     title: { type: String, required: true },
-    category: {
-      type: String,
-      required: true,
-      enum: ["saas", "podcast", "motion", "fast"],
-    },
+    category: { type: String, required: true },
     vimeoUrl: { type: String, required: true },
     thumbnailUrl: { type: String },
     order: { type: Number, default: 0 },

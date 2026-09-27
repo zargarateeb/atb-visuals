@@ -6,8 +6,9 @@ import { CSS } from "@dnd-kit/utilities";
 interface Project {
   _id: string;
   title: string;
-  category: "saas" | "podcast" | "motion" | "fast";
+  category: string;
   vimeoUrl: string;
+  thumbnailUrl?: string;
   order: number;
 }
 
@@ -50,7 +51,6 @@ export default function SortableProjectRow({
           : "border-white/10 hover:bg-white/[0.06]"
       }`}
     >
-      {/* Drag handle */}
       <button
         {...attributes}
         {...listeners}
@@ -67,7 +67,6 @@ export default function SortableProjectRow({
         </svg>
       </button>
 
-      {/* Content */}
       <div className="min-w-0 flex-1">
         <p className="font-medium text-sm truncate">{project.title}</p>
         <a
@@ -80,7 +79,6 @@ export default function SortableProjectRow({
         </a>
       </div>
 
-      {/* Actions */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={() => onEdit(project)}
