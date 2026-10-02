@@ -116,6 +116,49 @@ export default function HeroState({ onPortfolio, onAbout }: HeroStateProps) {
               About Me
             </button>
           </motion.div>
+
+          {/* Already a Client CTA — purple outline button */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.7, delay: 1.15 }}
+  className="mt-6"
+>
+  <a
+    href="https://atb-client-hub.vercel.app"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all hover:scale-105"
+    style={{
+      color: "#A000FF",
+      border: "1.5px solid #A000FF",
+      background: "transparent",
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = "#A000FF";
+      e.currentTarget.style.color = "#FFFFFF";
+      e.currentTarget.style.boxShadow =
+        "0 8px 24px rgba(160, 0, 255, 0.35)";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = "transparent";
+      e.currentTarget.style.color = "#A000FF";
+      e.currentTarget.style.boxShadow = "none";
+    }}
+  >
+    <span
+      className="w-2 h-2 rounded-full flex-shrink-0"
+      style={{
+        background: "#10B981",
+        boxShadow: "0 0 8px rgba(16, 185, 129, 0.8)",
+      }}
+    />
+    <span>Already a Client?</span>
+    <span className="transition-transform group-hover:translate-x-0.5">
+      →
+    </span>
+  </a>
+</motion.div>
         </div>
       </div>
     </motion.div>
