@@ -8,6 +8,7 @@ interface PortfolioStateProps {
   index: number;
   onOrder: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onTestimonials: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onPlans?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 interface Project {
@@ -41,6 +42,7 @@ const mod = (n: number, m: number) => ((n % m) + m) % m;
 export default function PortfolioState({
   onOrder,
   onTestimonials,
+  onPlans,
 }: PortfolioStateProps) {
   const [grid, setGrid] = useState({ x: 0, y: 0 });
   const [entering, setEntering] = useState<
@@ -267,6 +269,24 @@ export default function PortfolioState({
         }}
       >
         ⭐ Reviews
+      </motion.button>
+      {/* Plans button */}
+      <motion.button
+        onClick={(e) => onPlans?.(e)}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.7 }}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.96 }}
+        className="fixed bottom-6 right-96 z-40 px-5 py-3 rounded-full text-white font-semibold text-xs md:text-sm cursor-pointer"
+          style={{
+            background: "rgba(0,0,0,0.6)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(192, 0, 255, 0.5)",
+            boxShadow: "0 0 20px rgba(192, 0, 255, 0.3)",
+          }}
+        >
+          💰 Plans
       </motion.button>
     </motion.div>
   );

@@ -198,6 +198,12 @@ export default function AdminPage() {
             </p>
           </div>
           <nav className="hidden md:flex items-center gap-2">
+            <Link
+              href="/admin/plan-categories"
+              className="px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-neutral-400 hover:border-purple-500/50 hover:text-purple-400 transition-colors"
+            >
+              Plans
+            </Link>
             <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-purple-600 text-white">
               Projects
             </span>

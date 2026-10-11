@@ -6,6 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 interface InquiryModalProps {
   isOpen: boolean;
   onClose: () => void;
+  prefill?: {
+    projectType?: string;
+    budget?: string;
+    message?: string;
+  };
 }
 
 const FORMSPREE_URL = "https://formspree.io/f/mzezznpa";
@@ -57,7 +62,11 @@ const CONTACT_PREF = ["Email", "WhatsApp", "Call"];
 
 const FOOTAGE_READY = ["Yes", "No", "Partially"];
 
-export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
+export default function InquiryModal({
+  isOpen,
+  onClose,
+  prefill,
+}: InquiryModalProps) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -80,6 +89,14 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  // Prefill form when opening with prefill data
+useEffect(() => {
+  if (isOpen && prefill) {
+    // We'll set these when form renders via defaultValue
+    // This effect just forces a re-render if needed
+  }
+}, [isOpen, prefill]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
@@ -269,7 +286,8 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                           id="projectType"
                           name="projectType"
                           required
-                          defaultValue=""
+                          defaultValue={prefill?.projectType || ""}
+                          key={prefill?.projectType || "empty"}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500 focus:outline-none transition-colors text-sm cursor-pointer"
                         >
                           <option value="" disabled className="bg-neutral-900">
@@ -293,7 +311,8 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                         <select
                           id="budget"
                           name="budget"
-                          defaultValue=""
+                          defaultValue={prefill?.budget || ""}
+                          key={prefill?.budget || "empty"}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500 focus:outline-none transition-colors text-sm cursor-pointer"
                         >
                           <option value="" disabled className="bg-neutral-900">
@@ -459,7 +478,9 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                         id="message"
                         name="message"
                         required
-                        rows={4}
+                        rows={6}
+                        defaultValue={prefill?.message || ""}
+                        key={prefill?.message || "empty"}
                         placeholder="Describe your idea, style, key moments, music vibe, anything important..."
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-purple-500 focus:outline-none transition-colors text-sm resize-none"
                       />

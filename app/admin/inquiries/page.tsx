@@ -3,12 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-<Link
-  href="/admin/testimonials"
-  className="text-xs text-neutral-500 hover:text-purple-400 transition-colors"
->
-  Testimonials →
-</Link>
 
 interface Inquiry {
   _id: string;
@@ -97,19 +91,59 @@ export default function InquiriesPage() {
   };
 
   return (
-    <div style={{ overflow: "auto", height: "100vh" }}>
+    <div
+      className="min-h-screen bg-[#0a0014] text-white"
+      style={{ overflow: "auto", height: "100vh" }}
+    >
+      {/* Top Bar */}
+      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 bg-[#0a0014]/80 backdrop-blur-md z-10">
+        <div className="flex items-center gap-6">
+          <div>
+            <h1 className="font-display text-xl font-bold">
+              ATB Visuals — Admin
+            </h1>
+            <p className="text-neutral-500 text-xs mt-0.5">
+              {inquiries.length} inquiries · {unreadCount} unread
+            </p>
+          </div>
+          <nav className="hidden md:flex items-center gap-2">
+            <Link
+              href="/admin"
+              className="px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-neutral-400 hover:border-purple-500/50 hover:text-purple-400 transition-colors"
+            >
+              Projects
+            </Link>
+            <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-purple-600 text-white">
+              Inquiries
+            </span>
+            <Link
+              href="/admin/testimonials"
+              className="px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-neutral-400 hover:border-purple-500/50 hover:text-purple-400 transition-colors"
+            >
+              Testimonials
+            </Link>
+            <Link
+              href="/admin/plan-categories"
+              className="px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-neutral-400 hover:border-purple-500/50 hover:text-purple-400 transition-colors"
+            >
+              Plans
+            </Link>
+          </nav>
+        </div>
+      </div>
+
       <div className="max-w-5xl mx-auto p-6">
         {/* Header */}
         <div className="mb-6">
-  <Link
-    href="/admin"
-    className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-purple-400 transition-colors mb-3"
-  >
-    ← Back to Projects
-  </Link>
-  <h1 className="font-display text-3xl font-bold text-white">
-    Inquiries
-  </h1>
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-purple-400 transition-colors mb-3"
+          >
+            ← Back to Projects
+          </Link>
+          <h1 className="font-display text-3xl font-bold text-white">
+            Inquiries
+          </h1>
           <p className="text-neutral-500 text-sm mt-1">
             {inquiries.length} total · {unreadCount} unread
           </p>
@@ -279,7 +313,10 @@ export default function InquiriesPage() {
                       </a>
                       {inquiry.phone && (
                         <a
-                          href={`https://wa.me/${inquiry.phone.replace(/[^0-9]/g, "")}`}
+                          href={`https://wa.me/${inquiry.phone.replace(
+                            /[^0-9]/g,
+                            ""
+                          )}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-4 py-2 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"

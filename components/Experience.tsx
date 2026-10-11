@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
-import TestimonialsState from "./states/TestimonialsState";
 import NavArrows from "./NavArrows";
 import InquiryModal from "./InquiryModal";
 import CircleWipe from "./CircleWipe";
@@ -12,6 +11,8 @@ import OpeningState from "./states/OpeningState";
 import HeroState from "./states/HeroState";
 import AboutState from "./states/AboutState";
 import PortfolioState from "./states/PortfolioState";
+import TestimonialsState from "./states/TestimonialsState";
+import PlansState from "./states/PlansState";
 import FinalCTAState from "./states/FinalCTAState";
 
 export type ExperienceState =
@@ -20,6 +21,7 @@ export type ExperienceState =
   | "about"
   | "portfolio"
   | "testimonials"
+  | "plans"
   | "final";
 
 const ORDER: ExperienceState[] = [
@@ -28,17 +30,21 @@ const ORDER: ExperienceState[] = [
   "about",
   "portfolio",
   "testimonials",
+  "plans",
   "final",
 ];
 
+// Wipe color for each destination state
 const WIPE_COLORS: Record<ExperienceState, string> = {
   opening: "#10001F",
   hero: "#DDE5FC",
   about: "#0a0005",
   portfolio: "#DDE5FC",
   testimonials: "#DDE5FC",
+  plans: "#DDE5FC",
   final: "#10001F",
 };
+
 export default function Experience() {
   const [state, setState] = useState<ExperienceState>("opening");
   const [portfolioIndex, setPortfolioIndex] = useState(0);
@@ -46,10 +52,17 @@ export default function Experience() {
   const [wipeActive, setWipeActive] = useState(false);
   const [wipeColor, setWipeColor] = useState("#DDE5FC");
   const [wipeOrigin, setWipeOrigin] = useState({ x: 0, y: 0 });
+  const [inquiryPrefill, setInquiryPrefill] = useState<
+    | {
+        projectType?: string;
+        budget?: string;
+        message?: string;
+      }
+    | undefined
+  >(undefined);
 
   const currentIndex = ORDER.indexOf(state);
 
-  // transitionTo now accepts optional click coordinates
   const transitionTo = useCallback(
     (
       nextState: ExperienceState,
@@ -58,7 +71,6 @@ export default function Experience() {
     ) => {
       if (nextState === state && nextPortfolioIndex === portfolioIndex) return;
 
-      // If a click point is provided, start there. Otherwise, center of screen.
       const origin =
         clickPoint ??
         (typeof window !== "undefined"
@@ -111,6 +123,11 @@ export default function Experience() {
       ? portfolioIndex < 3
       : currentIndex < ORDER.length - 1;
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setInquiryPrefill(undefined);
+  };
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-black">
       <AnimatePresence mode="wait">
@@ -135,24 +152,73 @@ export default function Experience() {
         )}
         {state === "about" && <AboutState key="about" />}
         {state === "portfolio" && (
-  <PortfolioState
-    key="portfolio"
-    index={portfolioIndex}
-    onOrder={(e) =>
-      transitionTo("final", 0, { x: e.clientX, y: e.clientY })
-    }
-    onTestimonials={(e) =>
-      transitionTo("testimonials", 0, { x: e.clientX, y: e.clientY })
-    }
-  />
-)}
-{state === "testimonials" && (
-  <TestimonialsState key="testimonials" />
-)}
+          <PortfolioState
+            key="portfolio"
+            index={portfolioIndex}
+            onOrder={(e) =>
+              transitionTo("final", 0, { x: e.clientX, y: e.clientY })
+            }
+            onTestimonials={(e) =>
+              transitionTo("testimonials", 0, { x: e.clientX, y: e.clientY })
+            }
+            onPlans={(e) =>
+              transitionTo("plans", 0, { x: e.clientX, y: e.clientY })
+            }
+          />
+        )}
+        {state === "testimonials" && (
+          <TestimonialsState key="testimonials" />
+        )}
+        {state === "plans" && (
+          <PlansState
+            key="plans"
+            onOrder={({
+              categoryName,
+              tierName,
+              startingPrice,
+              selectedAddons,
+              estimatedTotal,
+            }) => {
+              const total = estimatedTotal;
+              const budget =
+                total < 500
+                  ? "Under ₹500"
+                  : total < 1000
+                  ? "₹500 – ₹1000"
+                  : total < 1500
+                  ? "₹1000 – ₹1500"
+                  : total < 3000
+                  ? "₹1500 – ₹3,000"
+                  : "₹3,000+";
+
+              const addonLines = selectedAddons.length
+                ? `\n\nAdd-ons:\n${selectedAddons
+                    .map((a) => `• ${a.name} — ₹${a.price}`)
+                    .join("\n")}`
+                : "";
+
+              setInquiryPrefill({
+                projectType: "",
+                budget,
+                message:
+                  `[From Plans — ${categoryName}]\n\n` +
+                  `Interested in: ${tierName}\n` +
+                  `Starting price: ₹${startingPrice}` +
+                  addonLines +
+                  `\n\nEstimated total: ₹${total.toLocaleString("en-IN")}` +
+                  `\n\nPlease share more details.`,
+              });
+              setIsModalOpen(true);
+            }}
+          />
+        )}
         {state === "final" && (
           <FinalCTAState
             key="final"
-            onOrder={() => setIsModalOpen(true)}
+            onOrder={() => {
+              setInquiryPrefill(undefined);
+              setIsModalOpen(true);
+            }}
             onRestart={(e) =>
               transitionTo("opening", 0, { x: e.clientX, y: e.clientY })
             }
@@ -173,7 +239,8 @@ export default function Experience() {
 
       <InquiryModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closeModal}
+        prefill={inquiryPrefill}
       />
 
       <CircleWipe
