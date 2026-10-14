@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import PlanCategory from "@/lib/models/PlanCategory";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 
 async function requireAuth() {
   const session = await getServerSession(authOptions);
@@ -12,13 +12,14 @@ async function requireAuth() {
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth();
     await connectDB();
+    const { id } = await params;
     const body = await req.json();
-    const updated = await PlanCategory.findByIdAndUpdate(params.id, body, {
+    const updated = await PlanCategory.findByIdAndUpdate(id, body, {
       new: true,
     });
     if (!updated)
@@ -38,12 +39,13 @@ export async function PUT(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth();
     await connectDB();
-    await PlanCategory.findByIdAndDelete(params.id);
+    const { id } = await params;
+    await PlanCategory.findByIdAndDelete(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
