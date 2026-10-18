@@ -16,21 +16,23 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://atb-visuals.vercel.app"),
+
+  applicationName: "ATB Visuals",
+
   title: {
     default: "ATB Visuals | Video Editor & Motion Designer",
     template: "%s | ATB Visuals",
   },
+
   description:
     "Cinematic short-form edits, motion graphics, and SaaS product animations. Portfolio of ATB Visuals.",
-    keywords: [
-    // Brand & Main Terms
+
+  keywords: [
     "ATB Visuals",
     "Video Editor",
     "Motion Designer",
     "Motion Graphics Artist",
     "Video Production Studio",
-
-    // Short-Form & Social Media
     "Reels Editor",
     "TikTok Video Editor",
     "YouTube Shorts Editor",
@@ -38,16 +40,12 @@ export const metadata: Metadata = {
     "Viral Video Editor",
     "Instagram Reels Editing",
     "Social Media Content Creator",
-
-    // Tech, SaaS & Products
     "SaaS Animations",
     "SaaS Product Demo",
     "UI Animation",
     "App Preview Video",
     "Software Showcase Video",
     "Tech Explainer Video",
-
-    // Video Editing & VFX Styles
     "Cinematic Video Editing",
     "Motion Graphics",
     "3D Motion Graphics",
@@ -57,8 +55,6 @@ export const metadata: Metadata = {
     "Sound Design",
     "Kinetic Typography",
     "Video Post Production",
-
-    // Business & Services
     "Freelance Video Editor",
     "Remote Video Editor",
     "Hire Motion Designer",
@@ -67,11 +63,12 @@ export const metadata: Metadata = {
     "Brand Video Creation",
     "Explainer Video Creator",
   ],
+
   openGraph: {
     title: "ATB Visuals | Video Editor & Motion Designer",
     description:
       "Cinematic short-form edits, motion graphics, and SaaS product animations.",
-    url: "https://atb-visuals.vercel.app",
+    url: "https://atb-visuals.vercel.app/",
     siteName: "ATB Visuals",
     images: [
       {
@@ -84,6 +81,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
     title: "ATB Visuals | Video Editor & Motion Designer",
@@ -91,10 +89,9 @@ export const metadata: Metadata = {
       "Cinematic short-form edits, motion graphics, and SaaS product animations.",
     images: ["https://ik.imagekit.io/5xwchyocd7/potrailt.png"],
   },
-  icons: {
-    icon: "https://ik.imagekit.io/5xwchyocd7/potrailt.png",
-    shortcut: "https://ik.imagekit.io/5xwchyocd7/potrailt.png",
-    apple: "https://ik.imagekit.io/5xwchyocd7/potrailt.png",
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -105,7 +102,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} ${inter.variable} antialiased`}>
+      <body
+        className={`${spaceGrotesk.variable} ${inter.variable} antialiased`}
+      >
         {children}
       </body>
     </html>
