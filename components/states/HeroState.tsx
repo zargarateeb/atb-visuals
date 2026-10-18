@@ -38,7 +38,7 @@ export default function HeroState({ onPortfolio, onAbout }: HeroStateProps) {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               src="https://ik.imagekit.io/5xwchyocd7/potrailt.png"
-              alt="Ateeb"
+              alt="Ateeb - ATB Visuals Short Form Video Editor & Motion Designer"
               className="absolute inset-0 w-full h-full object-contain object-bottom pointer-events-none"
               style={{ transform: "scale(1.15) translateY(5%)" }}
             />
@@ -63,11 +63,12 @@ export default function HeroState({ onPortfolio, onAbout }: HeroStateProps) {
             </span>
           </motion.div>
 
+          {/* SEO Optimized H1 Tag */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.7 }}
-            className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-neutral-900 leading-[1.05]"
+            className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 leading-[1.05]"
           >
             Hi, I am{" "}
             <span
@@ -76,15 +77,19 @@ export default function HeroState({ onPortfolio, onAbout }: HeroStateProps) {
             >
               Ateeb
             </span>
+            <span className="block text-2xl md:text-3xl text-neutral-800 font-semibold mt-1">
+              ATB Visuals
+            </span>
           </motion.h1>
 
+          {/* SEO Keywords in Paragraph Tag */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.85 }}
             className="text-neutral-700 text-base md:text-lg font-medium max-w-md"
           >
-            Short Form Video Editor & Motion Designer
+            Short Form Video Editor, Motion Designer & SaaS Animation Specialist.
           </motion.p>
 
           <motion.div
@@ -117,48 +122,47 @@ export default function HeroState({ onPortfolio, onAbout }: HeroStateProps) {
             </button>
           </motion.div>
 
-          {/* Already a Client CTA — purple outline button */}
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.7, delay: 1.15 }}
-  className="mt-6"
->
-  <a
-    href="https://atb-client-hub.vercel.app"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all hover:scale-105"
-    style={{
-      color: "#A000FF",
-      border: "1.5px solid #A000FF",
-      background: "transparent",
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.background = "#A000FF";
-      e.currentTarget.style.color = "#FFFFFF";
-      e.currentTarget.style.boxShadow =
-        "0 8px 24px rgba(160, 0, 255, 0.35)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.background = "transparent";
-      e.currentTarget.style.color = "#A000FF";
-      e.currentTarget.style.boxShadow = "none";
-    }}
-  >
-    <span
-      className="w-2 h-2 rounded-full flex-shrink-0"
-      style={{
-        background: "#10B981",
-        boxShadow: "0 0 8px rgba(16, 185, 129, 0.8)",
-      }}
-    />
-    <span>Already a Client?</span>
-    <span className="transition-transform group-hover:translate-x-0.5">
-      →
-    </span>
-  </a>
-</motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.15 }}
+            className="mt-6"
+          >
+            <a
+              href="https://atb-client-hub.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all hover:scale-105"
+              style={{
+                color: "#A000FF",
+                border: "1.5px solid #A000FF",
+                background: "transparent",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#A000FF";
+                e.currentTarget.style.color = "#FFFFFF";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 24px rgba(160, 0, 255, 0.35)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "#A000FF";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{
+                  background: "#10B981",
+                  boxShadow: "0 0 8px rgba(16, 185, 129, 0.8)",
+                }}
+              />
+              <span>Already a Client?</span>
+              <span className="transition-transform group-hover:translate-x-0.5">
+                →
+              </span>
+            </a>
+          </motion.div>
         </div>
       </div>
     </motion.div>
